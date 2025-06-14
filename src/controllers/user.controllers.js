@@ -1,0 +1,39 @@
+import User from "../models/user.model.js";
+
+const getAll = async (req, res, next) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const [users, total] = await Promise.all([
+      User.find().skip(skip).limit(limit),
+      User.countDocuments(),
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+
+    const userResponse = users.map((user) => ({
+      id: user._id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+    }));
+
+    res.status(200).json({
+      success: true,
+      message: "Users retrieved successfully",
+      data: userResponse,
+      pagination: {
+        total,
+        page,
+        totalPages,
+        limit,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export default { getAll };
