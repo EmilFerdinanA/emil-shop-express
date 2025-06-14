@@ -11,3 +11,6 @@ const roleSchema = new mongoose.Schema({
     required: [true, "Name is required"],
   },
 });
+
+const Role = mongoose.model("Role", roleSchema);
+export default Role;
