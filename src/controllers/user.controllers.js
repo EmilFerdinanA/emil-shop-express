@@ -5,9 +5,15 @@ const getAll = async (req, res, next) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
+    const { username } = req.query;
+
+    let filter = {};
+    if (username) {
+      filter.username = { $regex: username, $options: "i" };
+    }
 
     const [users, total] = await Promise.all([
-      User.find().skip(skip).limit(limit),
+      User.find(filter).skip(skip).limit(limit),
       User.countDocuments(),
     ]);
 
