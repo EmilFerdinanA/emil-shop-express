@@ -55,7 +55,7 @@ const signUp = async (req, res, next) => {
       role: newUser.role,
     };
 
-    return res.status(201).json({
+    res.status(201).json({
       success: true,
       message: "User created successfully",
       data: userResponse,
