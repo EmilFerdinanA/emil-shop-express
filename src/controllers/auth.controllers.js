@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import { JWT_SECRET, JWT_EXPIRES_IN } from "../config/env.js";
 import User from "../models/user.model.js";
 import Role from "../models/role.model.js";
+import createError from "../utils/createError.js";
 
 const signUp = async (req, res, next) => {
   const session = await mongoose.startSession();
@@ -12,19 +13,12 @@ const signUp = async (req, res, next) => {
   try {
     const { username, email, password, role } = req.body;
 
-    const existingUser = await User.findOne({ username }).session(session);
-    if (existingUser) {
-      const error = new Error("Username already exists");
-      error.statusCode = 409;
-      throw error;
-    }
-
-    const existingEmail = await User.findOne({ email }).session(session);
-    if (existingEmail) {
-      const error = new Error("Email already exists");
-      error.statusCode = 409;
-      throw error;
-    }
+    const [existingUser, existingEmail] = await Promise.all([
+      User.findOne({ username }).session(session),
+      User.findOne({ email }).session(session),
+    ]);
+    if (existingUser) throw createError("Username already exists", 409);
+    if (existingEmail) throw createError("Email already exists", 409);
 
     let existingRole = await Role.findOne({ name: role }).session(session);
     if (!existingRole) {
@@ -32,19 +26,14 @@ const signUp = async (req, res, next) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    const [newUser] = await User.create(
-      [
-        {
-          username,
-          email,
-          password: hashedPassword,
-          role: existingRole.name,
-          active: false,
-        },
-      ],
-      { session }
-    );
+    const newUser = new User({
+      username,
+      email,
+      password: hashedPassword,
+      role: existingRole.name,
+      active: false,
+    });
+    await newUser.save({ session });
 
     await session.commitTransaction();
 
@@ -71,22 +60,15 @@ const signUp = async (req, res, next) => {
 const signIn = async (req, res, next) => {
   try {
     const { username, password } = req.body;
+
     const existingUser = await User.findOne({ username });
-    if (!existingUser) {
-      const error = new Error("User not found");
-      error.statusCode = 404;
-      throw error;
-    }
+    if (!existingUser) throw createError("User not found", 404);
 
     const isPasswordValid = await bcrypt.compare(
       password,
       existingUser.password
     );
-    if (!isPasswordValid) {
-      const error = new Error("Invalid password");
-      error.statusCode = 401;
-      throw error;
-    }
+    if (!isPasswordValid) throw createError("Invalid password", 401);
 
     const userResponse = {
       id: existingUser._id,

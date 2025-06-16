@@ -3,7 +3,7 @@ import { DB_URI } from "./env.js";
 
 const connectDB = async () => {
   try {
-    mongoose.connect(DB_URI);
+    await mongoose.connect(DB_URI);
     console.log("✅ DB connected");
   } catch (error) {
     console.error("❌ DB connection failed:", error);

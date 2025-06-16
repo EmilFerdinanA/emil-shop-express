@@ -15,7 +15,16 @@ app.use("/api/v1/user", userRouter);
 
 app.use(errorMiddleware);
 
-app.listen(PORT, async () => {
-  await connectDB();
-  console.log(`Running Bos kuh ${PORT}`);
-});
+const startServer = async () => {
+  try {
+    await connectDB();
+    app.listen(PORT, () => {
+      console.log(`🚀 Running Bos kuh ${PORT}`);
+    });
+  } catch (error) {
+    console.error("❌ Startup failed:", error);
+    process.exit(1);
+  }
+};
+
+startServer();

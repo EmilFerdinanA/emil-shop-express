@@ -14,7 +14,7 @@ const getAll = async (req, res, next) => {
 
     const [users, total] = await Promise.all([
       User.find(filter).skip(skip).limit(limit),
-      User.countDocuments(),
+      User.countDocuments(filter),
     ]);
 
     const totalPages = Math.ceil(total / limit);
