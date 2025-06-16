@@ -57,7 +57,10 @@ const signIn = async (req, res, next) => {
   try {
     const { username, password } = req.body;
 
-    const existingUser = await User.findOne({ username });
+    const existingUser = await User.findOne({ username }).populate(
+      "role",
+      "name permissions -_id"
+    );
     if (!existingUser) throw createError("User not found", 404);
 
     const isPasswordValid = await bcrypt.compare(
@@ -66,14 +69,13 @@ const signIn = async (req, res, next) => {
     );
     if (!isPasswordValid) throw createError("Invalid password", 401);
 
-    const userResponse = {
+    const userPayload = {
       id: existingUser._id,
       username: existingUser.username,
-      email: existingUser.email,
-      role: existingUser.role,
+      role: existingUser.role.name,
     };
 
-    const token = jwt.sign(userResponse, JWT_SECRET, {
+    const token = jwt.sign(userPayload, JWT_SECRET, {
       expiresIn: JWT_EXPIRES_IN,
     });
 
@@ -82,7 +84,12 @@ const signIn = async (req, res, next) => {
       message: "Login successful",
       data: {
         token,
-        user: userResponse,
+        user: {
+          username: existingUser.username,
+          email: existingUser.email,
+          role: existingUser.role.name,
+          permissions: existingUser.role.permissions,
+        },
       },
     });
   } catch (error) {

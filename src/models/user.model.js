@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema(
     role: {
       type: String,
       required: [true, "Role is required"],
-      ref: "role",
+      ref: "Role",
     },
   },
   { timestamps: true }
