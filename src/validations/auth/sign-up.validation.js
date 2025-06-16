@@ -21,13 +21,7 @@ const signUpValidation = [
     .isEmail()
     .withMessage("Email must be a valid email address"),
 
-  body("role")
-    .trim()
-    .notEmpty()
-    .withMessage("Role is required")
-    .isIn(["super_admin", "seller", "customer"])
-    .withMessage("Role must be one of: super_admin, seller, customer"),
-  ,
+  body("role").trim().notEmpty().withMessage("Role is required"),
 ];
 
 export default signUpValidation;

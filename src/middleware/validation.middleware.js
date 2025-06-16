@@ -1,12 +1,11 @@
 import { validationResult } from "express-validator";
+import createError from "../utils/createError.js";
 
-const validationMiddleware = async (req, res, next) => {
+const validationMiddleware = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    const errorMessage = errors.array().map((e) => e.msg);
-    const error = new Error(errorMessage[0]);
-    error.statusCode = 422;
-    return next(error);
+    const message = errors.array()[0].msg;
+    return next(createError(message, 422));
   }
   next();
 };

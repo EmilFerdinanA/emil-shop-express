@@ -20,34 +20,30 @@ const signUp = async (req, res, next) => {
     if (existingUser) throw createError("Username already exists", 409);
     if (existingEmail) throw createError("Email already exists", 409);
 
-    let existingRole = await Role.findOne({ name: role }).session(session);
-    if (!existingRole) {
-      [existingRole] = await Role.create([{ name: role }], { session });
-    }
+    const existingRole = await Role.findOne({ name: role }).session(session);
+    if (!existingRole) throw createError("Invalid role", 400);
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({
       username,
       email,
       password: hashedPassword,
-      role: existingRole.name,
+      role: existingRole._id,
       active: false,
     });
     await newUser.save({ session });
 
     await session.commitTransaction();
 
-    const userResponse = {
-      id: newUser._id,
-      username: newUser.username,
-      email: newUser.email,
-      role: newUser.role,
-    };
-
     res.status(201).json({
       success: true,
       message: "User created successfully",
-      data: userResponse,
+      data: {
+        id: newUser._id,
+        username: newUser.username,
+        email: newUser.email,
+        role: newUser.role,
+      },
     });
   } catch (error) {
     await session.abortTransaction();
