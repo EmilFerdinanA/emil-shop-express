@@ -73,6 +73,7 @@ const signIn = async (req, res, next) => {
       id: existingUser._id,
       username: existingUser.username,
       role: existingUser.role.name,
+      permissions: existingUser.role.permissions,
     };
 
     const token = jwt.sign(userPayload, JWT_SECRET, {
