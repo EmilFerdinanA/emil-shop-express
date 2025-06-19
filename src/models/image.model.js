@@ -6,7 +6,7 @@ const imageSchema = new mongoose.Schema(
     _id: { type: String, default: uuidv4 },
     name: { type: String, required: true },
     path: { type: String, required: true },
-    contentType: { type: String, required: true },
+    product: { type: String, ref: "Product", required: true },
     size: { type: Number, required: true },
   },
   { timestamps: true }

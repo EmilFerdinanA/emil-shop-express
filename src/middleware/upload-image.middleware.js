@@ -4,7 +4,8 @@ import path from "path";
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, "public/uploads/images"),
   filename: (req, file, cb) => {
-    const uniqueName = Date.now() + "-" + file.originalname;
+    const cleanName = file.originalname.replace(/\s+/g, "_");
+    const uniqueName = Date.now() + "-" + cleanName;
     cb(null, uniqueName);
   },
 });
@@ -34,3 +35,4 @@ const fileFilter = (req, file, cb) => {
 const limits = { fileSize: 5 * 1024 * 1024 };
 
 const upload = multer({ storage, fileFilter, limits });
+export default upload;

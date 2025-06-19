@@ -5,6 +5,7 @@ import connectDB from "./config/db.js";
 import authRouter from "./routes/auth.route.js";
 import userRouter from "./routes/user.route.js";
 import roleRouter from "./routes/role.route.js";
+import productRouter from "./routes/product.route.js";
 
 import verifyToken from "./middleware/auth.middleware.js";
 import errorMiddleware from "./middleware/error.middleware.js";
@@ -18,6 +19,7 @@ app.use("/api/v1/auth", authRouter);
 app.use(verifyToken);
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/role", roleRouter);
+app.use("/api/v1/product", productRouter);
 
 app.use(errorMiddleware);
 
