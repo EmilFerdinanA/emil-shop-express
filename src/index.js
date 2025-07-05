@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import { NODE_ENV, PORT } from "./config/env.js";
 import connectDB from "./config/db.js";
 
@@ -12,6 +13,7 @@ import errorMiddleware from "./middleware/error.middleware.js";
 import { seedSuperAdmin } from "./seeder/super_admin.seed.js";
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 app.use("/api/v1/auth", authRouter);
