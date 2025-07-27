@@ -5,6 +5,8 @@ import validationMiddleware from "../middleware/validation.middleware.js";
 
 const roleRouter = Router();
 
+roleRouter.get("/", roleControllers.getAll);
+
 roleRouter.post(
   "/",
   createRoleValidation,

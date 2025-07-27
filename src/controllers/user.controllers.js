@@ -13,7 +13,10 @@ const getAll = async (req, res, next) => {
     }
 
     const [users, total] = await Promise.all([
-      User.find(filter).skip(skip).limit(limit),
+      User.find(filter)
+        .skip(skip)
+        .limit(limit)
+        .populate({ path: "role", select: "name" }),
       User.countDocuments(filter),
     ]);
 
@@ -23,7 +26,10 @@ const getAll = async (req, res, next) => {
       id: user._id,
       username: user.username,
       email: user.email,
-      role: user.role,
+      role: {
+        id: user.role.id,
+        name: user.role.name,
+      },
     }));
 
     res.status(200).json({
